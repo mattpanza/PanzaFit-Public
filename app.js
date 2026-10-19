@@ -284,9 +284,9 @@ const kneeCircuit={
   circuit:[['Wall tibialis raise','20 reps'],['Straight-knee calf raise','15 reps'],['Bent-knee calf raise','15 reps'],['Patrick step-down','8 each leg'],['Assisted, front-foot-elevated ATG split squat','5 each leg'],['Single-leg glute bridge','10 each leg'],['Side-lying hip abduction','12 each leg']],
   finish:[['Elephant walks','10 each leg'],['Couch stretch','45 seconds each leg'],['Calf stretch','45 seconds each leg']]
 };
-function scheduledKneeCircuitAvailable(){ensureScheduleState();return state.phase===0&&state.nextEventType==='rest'&&state.scheduleDate===todayISO()&&!state.restDays[todayISO()];}
+function scheduledKneeCircuitAvailable(){return false;}
 function kneeCircuitAvailable(){return scheduledKneeCircuitAvailable()}
-function kneeCircuitActive(){return state.activeKneeCircuitDate===todayISO()}
+function kneeCircuitActive(){return false;}
 function kneeSessionNumber(){return Math.min(6,(state.kneeHistory||[]).length+1)}
 function kneeWeek(){return Math.min(3,Math.ceil(kneeSessionNumber()/2))}
 function openKneeOverview(){
@@ -341,11 +341,7 @@ function renderToday(){
     document.getElementById('sessionLabel').textContent='Rest day acknowledged';
   }else if(isRest){
     document.getElementById('phaseLabel').textContent=`${p.name} · Round ${state.round+1} of ${p.rounds}`;
-    if(state.phase===0){
-      document.getElementById('nextWorkout').textContent='Off-day knee circuit';
-      document.getElementById('sessionLabel').textContent=`Knee session ${kneeSessionNumber()} of 6 · Week ${kneeWeek()} of 3`;
-      startBtn.textContent='View knee circuit';startBtn.style.display='block';
-    }else{
+    {
       document.getElementById('nextWorkout').textContent='Rest day';
       document.getElementById('sessionLabel').textContent='No workout planned today';
       restBtn.style.display='block';
@@ -1118,7 +1114,7 @@ function renderWorkout(){
 function closeFinish(){document.getElementById('finishModal').classList.remove('show');document.getElementById('finishModal').setAttribute('aria-hidden','true')}
 function saveWorkout(){
   ensureScheduleState();
-  if(kneeCircuitActive()||scheduledKneeCircuitAvailable()){
+  if(false){
     const today=todayISO(),performedDate=document.getElementById('sumDate')?.value||today,d=kneeDraft(),scheduledRest=scheduledKneeCircuitAvailable();
     const summary={duration:durationPickerValue('sum'),time:document.getElementById('sumTime')?.value||currentTimeHHMM(),totalCalories:num('sumTotalCal'),avgHr:num('sumAvgHr'),postWeight:num('sumWeight'),notes:document.getElementById('sumNotes').value.trim()};
     state.kneeHistory=state.kneeHistory||[];
@@ -1868,13 +1864,7 @@ function renderProgramWorkoutLibrary(){
       <span>View ›</span>
     </button>`).join('');
 
-    const kneeRow=pi===0?`<button class="program-workout-row knee-library-row" type="button" onclick="openKneeLibraryPreview()">
-      <div>
-        <b>Off-day knee circuit</b>
-        <small>6 Phase 1 off-day sessions · 2 rounds</small>
-      </div>
-      <span>View ›</span>
-    </button>`:'';
+    const kneeRow='';
 
     return `<div class="card program-phase-card">
       <div class="eyebrow">Phase ${pi+1}</div>
@@ -2611,7 +2601,7 @@ async function resetForNewUser(){
 function renderAll(){renderToday();renderWorkout();renderNutrition();renderChecklist();renderHistory();renderProgress();renderProgramStartControls()}
 function num(id){return parseFloat(document.getElementById(id).value)||0}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.screen)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.go)));document.getElementById('startBtn').addEventListener('click',()=>{if(scheduledKneeCircuitAvailable()){state.activeKneeCircuitDate=todayISO();save();openKneeOverview();}else showScreen('workout')});
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.screen)));document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showScreen(b.dataset.go)));document.getElementById('startBtn').addEventListener('click',()=>showScreen('workout'));
 document.getElementById('ackRestBtn').addEventListener('click',acknowledgeRest);document.getElementById('closeFinish').addEventListener('click',closeFinish);document.getElementById('saveWorkoutBtn').addEventListener('click',saveWorkout);document.getElementById('skipTimer').addEventListener('click',stopTimer);document.getElementById('saveWeightBtn').addEventListener('click',saveWeights);document.getElementById('nutritionDate').addEventListener('change',renderNutrition);document.getElementById('saveGoalsBtn').addEventListener('click',saveGoals);document.getElementById('prevMonth').addEventListener('click',()=>{calendarCursor.setMonth(calendarCursor.getMonth()-1);renderHistory()});document.getElementById('nextMonth').addEventListener('click',()=>{calendarCursor.setMonth(calendarCursor.getMonth()+1);renderHistory()});document.getElementById('activityType').addEventListener('change',setHrDefaultsForType);
 
 
